@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lights Client</title>
+    <style>
+        /* 스위치 스타일링 */
+        label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        input[role="switch"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 50px;
+            height: 24px;
+            background-color: #ccc;
+            border-radius: 12px;
+            position: relative;
+            outline: none;
+            transition: background-color 0.3s ease;
+        }
+
+        input[role="switch"]:checked {
+            background-color: #4CAF50;
+        }
+
+        input[role="switch"]::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s ease;
+        }
+
+        input[role="switch"]:checked::before {
+            transform: translateX(26px);
+        }
+
+        span {
+            margin-left: 10px;
+            font-size: 16px;
+        }
+
+        body {
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lights Client</h1>
+    <label>
+        <input role="switch" type="checkbox" id="turn" disabled/>
+        <span>전원</span>
+    </label><br>
+
+    <label for="color">Color:</label>
+    <input type="color" id="color" disabled><br>
+
+    <div id="response"></div>
+
+    <script>
+        function fetchDataAndUpdateUI() {
+            fetch('http://127.0.0.1:5001/api')
+                .then(response => response.json())
+                .then(data => {
+                    // 전원 상태에 따라 스위치 업데이트
+                    document.getElementById('turn').checked = data.turn === 'on';
+
+                    // 색상 선택기와 백그라운드 컬러 업데이트
+                    document.getElementById('color').value = data.color;
+                    document.body.style.backgroundColor = data.color;
+
+                    if (data.turn === 'off'){
+                        document.body.style.backgroundColor = 'white';
+                    }
+
+                    // 상태를 화면에 표시
+                    document.getElementById('response').innerText = `Power: ${data.turn}, Color: ${data.color}`;
+                });
+        }
+
+        // 1초마다 fetchDataAndUpdateUI 호출
+        setInterval(fetchDataAndUpdateUI, 1000);
+
+        // 페이지 로드 시 초기 데이터 불러오기
+        window.onload = fetchDataAndUpdateUI;
+    </script>
+</body>
+</html>

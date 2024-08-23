@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lights Control</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <h1>Lights Control</h1>
+    <form id="controlForm">
+        <label>
+            <input role="switch" type="checkbox" id="turn" name="turn" />
+            <span>전원</span>
+        </label><br>
+
+        <label for="color">Color:</label>
+        <input type="color" id="color" name="color" value="#000000"><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('controlForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const turn = document.getElementById('turn').checked ? 'on' : 'off';
+            const color = document.getElementById('color').value;
+
+            fetch('/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ turn, color })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('response').innerText = `Power: ${data.turn}, Color: ${data.color}`;
+            });
+        });
+
+        // 서버에서 현재 전원 상태와 색상을 불러와 초기화
+        window.onload = function() {
+            fetch('/api')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('turn').checked = data.turn === 'on';
+                    document.getElementById('color').value = data.color;
+                });
+        };
+    </script>
+</body>
+</html>
