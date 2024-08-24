@@ -1,5 +1,6 @@
 # Jaram-Home-Assistants
 
+## 스크린샷
 <img src="./TEST.gif" />
 
 ## 목적 및 용도
